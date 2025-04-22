@@ -36,7 +36,7 @@ namespace NeutronThresholds {
         for (unsigned c = 0; c < contrib.size(); ++c) {
             if(debug) std::cout << "hit time = " << contrib.at(c).getTime() << std::endl;
 
-            double t_min_per_evt = std::min(1100, contrib.at(c).getTime());
+            double t_min_per_contrib = std::min(1100, contrib.at(c).getTime());
 
             if (h_contrib_time) h_contrib_time->Fill(contrib.at(c).getTime());
             if (h_contrib_energy) h_contrib_energy->Fill(contrib.at(c).getEnergy());
