@@ -30,14 +30,14 @@ namespace NeutronThresholds {
         double t_min = 1100;
 
         for (unsigned c = 0; c < contrib.size(); ++c) {
+            if (contrib.at(c).getTime() < t_min) { t_min = contrib.at(c).getTime(); }
+        }
+
+        for (unsigned c = 0; c < contrib.size(); ++c) {
             if(debug) std::cout << "hit time = " << contrib.at(c).getTime() << std::endl;
 
             if (h_contrib_time) h_contrib_time->Fill(contrib.at(c).getTime());
             if (h_contrib_energy) h_contrib_energy->Fill(contrib.at(c).getEnergy());
-
-            if (contrib.at(c).getTime() < t_min) {
-                t_min = contrib.at(c).getTime();
-            }
 
             for (int itm = 0; itm < T_MAX.size(); itm++) {
                 if (contrib.at(c).getTime() < T_MAX[itm]) {
