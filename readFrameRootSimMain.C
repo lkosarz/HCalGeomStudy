@@ -76,10 +76,11 @@ R__LOAD_LIBRARY(libfmt.so)
 #include "FileList.h"
 #include "HistogramsSim.h"
 #include "HistogramsDepthCheck.h"
-#include "HistogramsNeutronThresholds.h"
 #include "EICutil.h"
 #include "BasicUtil.h"
 
+#include "HistogramsNeutronThresholds.h"
+#include "NeutronThresholdUtil.h"
 
 using namespace std;
 using namespace ROOT;
@@ -669,11 +670,14 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 
 	h_nHCal_nhits->Fill(nHCal_hitscoll.size());
 
-        vector<vector<double>> hits_passed{ {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0} };
-        vector<vector<double>> hits_passed_telap{ {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0} };
-        double E_mip = 0.00075;
-        vector<double> t_max{25, 100, 500, 1000, 10000};
-        vector<double> E_th{0.5 * E_mip, 0.25 * E_mip, 0.1 * E_mip, 0.05 * E_mip, 0};
+        // vector<vector<double>> hits_passed{ {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0} };
+        // vector<vector<double>> hits_passed_telap{ {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0} };
+        // double E_mip = 0.00075;
+        // vector<double> t_max{25, 100, 500, 1000, 10000};
+        // vector<double> E_th{0.5 * E_mip, 0.25 * E_mip, 0.1 * E_mip, 0.05 * E_mip, 0};
+
+        auto hits_passed = NeutronThresholds::createHitsPassedMatrix();
+        auto hits_passed_telap = NeutronThresholds::createHitsPassedMatrix();
 
 		for (unsigned hit_iter = 0; hit_iter < nHCal_hitscoll.size(); ++hit_iter) {
 
@@ -709,10 +713,16 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 
 			auto contrib = hit_nHCal.getContributions();
 
-			vector<double> E_sum{0,0,0,0,0};
-			vector<double> E_sum_telap{0,0,0,0,0};
+			NeutronThresholds::processContributions(contrib, hits_passed, hits_passed_telap, h_nHCal_hit_contrib_time, h_nHCal_hit_contrib_energy, debug);
 
-			double t_min = 1100;
+//--------------------------------------------------------------------------------------------------------------------------------------------------
+//All these comments are the old code for processing contributions. Modular version is yet to be tested. Comments will be deleted when that is done.
+//--------------------------------------------------------------------------------------------------------------------------------------------------
+
+			// vector<double> E_sum{0,0,0,0,0};
+			// vector<double> E_sum_telap{0,0,0,0,0};
+
+			// double t_min = 1100;
 
 			for (unsigned c = 0; c < contrib.size(); ++c) {
 
@@ -723,34 +733,36 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 
 				if(debug) cout<<"hit time = "<<contrib.at(c).getTime()<<endl;
 
-				h_nHCal_hit_contrib_time->Fill(contrib.at(c).getTime());
-				h_nHCal_hit_contrib_energy->Fill(contrib.at(c).getEnergy());
+				// h_nHCal_hit_contrib_time->Fill(contrib.at(c).getTime());
+				// h_nHCal_hit_contrib_energy->Fill(contrib.at(c).getEnergy());
 
-				if ( contrib.at(c).getTime() < t_min ) { t_min = contrib.at(c).getTime(); }
+				// if ( contrib.at(c).getTime() < t_min ) { t_min = contrib.at(c).getTime(); }
 
-				for ( int itm=0; itm < t_max.size(); itm++ ) {
-					if ( contrib.at(c).getTime() < t_max[itm] ) { E_sum[itm]+=(contrib.at(c).getEnergy()); }
-					if ( (contrib.at(c).getTime() - t_min) < t_max[itm] ) { E_sum_telap[itm]+=(contrib.at(c).getEnergy()); }
-				}
+				// for ( int itm=0; itm < t_max.size(); itm++ ) {
+				// 	if ( contrib.at(c).getTime() < t_max[itm] ) { E_sum[itm]+=(contrib.at(c).getEnergy()); }
+				// 	if ( (contrib.at(c).getTime() - t_min) < t_max[itm] ) { E_sum_telap[itm]+=(contrib.at(c).getEnergy()); }
+				// }
 			}
 
-			for ( int iet=0; iet < E_th.size(); iet++) {
-			    for ( int ies=0; ies < E_sum.size(); ies++ ) {
-					if (E_sum[ies] > E_th[iet]) { hits_passed[iet][ies]+=1; }
-                    if (E_sum_telap[ies] > E_th[iet]) { hits_passed_telap[iet][ies]+=1; }
-				}
-		    }
+			// for ( int iet=0; iet < E_th.size(); iet++) {
+			//     for ( int ies=0; ies < E_sum.size(); ies++ ) {
+			// 		if (E_sum[ies] > E_th[iet]) { hits_passed[iet][ies]+=1; }
+   //                  if (E_sum_telap[ies] > E_th[iet]) { hits_passed_telap[iet][ies]+=1; }
+			// 	}
+		 //    }
 			//delete contrib_data;
 
 		} // HcalEndcapNHits loop
 
-		for ( int iet=0; iet < E_th.size(); iet++) {
-			for ( int itm=0; itm < t_max.size(); itm++ ) {
-				if ( hits_passed[iet][itm] > 0 ) { h_nHCal_hit_contrib_energy_vs_time->Fill( E_th[iet], t_max[itm] ); }
-                if ( hits_passed_telap[iet][itm] > 0 ) { h_nHCal_hit_contrib_energy_vs_telap->Fill( E_th[iet], t_max[itm] ); }
-               	h_nHCal_hit_contrib_energy_vs_time_total->Fill( E_th[iet], t_max[itm] );
-			}
-		}
+		// for ( int iet=0; iet < E_th.size(); iet++) {
+		// 	for ( int itm=0; itm < t_max.size(); itm++ ) {
+		// 		if ( hits_passed[iet][itm] > 0 ) { h_nHCal_hit_contrib_energy_vs_time->Fill( E_th[iet], t_max[itm] ); }
+  //               if ( hits_passed_telap[iet][itm] > 0 ) { h_nHCal_hit_contrib_energy_vs_telap->Fill( E_th[iet], t_max[itm] ); }
+  //              	h_nHCal_hit_contrib_energy_vs_time_total->Fill( E_th[iet], t_max[itm] );
+		// 	}
+		// }
+		//
+		NeutronThresholds::fillThresholdHistograms(hits_passed,hits_passed_telap, h_nHCal_hit_contrib_energy_vs_time, h_nHCal_hit_contrib_energy_vs_telap, h_nHCal_hit_contrib_energy_vs_time_total);
 
 
 		for (int lbin = 1; lbin <= h_temp_depth_nHCal_z->GetXaxis()->GetNbins(); ++lbin) {
