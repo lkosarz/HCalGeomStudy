@@ -2,3 +2,7 @@ output/
 output/*.root
 DictOutput.cxx
 DictOutput_rdict.pcm
+
+Analysis_job.sh
+test_outputs
+submit.sh

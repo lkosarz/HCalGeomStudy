@@ -98,13 +98,23 @@ bool debug = false;
 
 int main(int argc, char **argv)
 {
-	readFrameRootSim();
+    if (argc < 4) {
+        std::cerr << "Usage: " << argv[0] << " <input_list> <output_file> <number_of_events>" << std::endl;
+        return 1;
+    }
 
-	return 1;
+    TString inputList = argv[1];
+    TString outputFile = argv[2];
+    long numberOfEvents = std::stol(argv[3]);
+
+    return readFrameRootSim(inputList, outputFile, numberOfEvents);
 }
 
 int readFrameRootSim(TString list, TString ofname, long nevents)
 {
+    std::cout << "Input list: " << list << std::endl;
+    std::cout << "Output file: " << ofname << std::endl;
+    std::cout << "Number of events: " << nevents << std::endl;
 
 	// open file w/ frame reader
 	podio::ROOTReader *reader = new podio::ROOTReader();
@@ -734,6 +744,7 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 				if(debug) cout<<"hit time = "<<contrib.at(c).getTime()<<endl;
 
 				// h_nHCal_hit_contrib_time->Fill(contrib.at(c).getTime());
+				// h_nHCal_hit_contrib_time->Fill( 750 );
 				// h_nHCal_hit_contrib_energy->Fill(contrib.at(c).getEnergy());
 
 				// if ( contrib.at(c).getTime() < t_min ) { t_min = contrib.at(c).getTime(); }
