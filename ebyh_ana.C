@@ -4,7 +4,7 @@
 #include <TSystem.h>
 #include "style.C"
 
-/// Macro for calculating Sampling fraction and e and h response
+/// Macro for calculating Sampling fraction and e & h response
 /// for different particles with different momentum in the HCal
 /// this file is taken from https://github.com/OSUNuclearPhysics/ePIC_preTDR_nHCal_eh-ratio/blob/main/ebyh_ana.C
 /// Please see the README file for more detaiiled information
