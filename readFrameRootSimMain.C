@@ -79,6 +79,8 @@ R__LOAD_LIBRARY(libfmt.so)
 #include "EICutil.h"
 #include "BasicUtil.h"
 
+#include "HistogramsNeutronThresholds.h"
+#include "NeutronThresholdUtil.h"
 
 using namespace std;
 using namespace ROOT;
@@ -96,13 +98,23 @@ bool debug = false;
 
 int main(int argc, char **argv)
 {
-	readFrameRootSim();
+    if (argc < 4) {
+        std::cerr << "Usage: " << argv[0] << " <input_list> <output_file> <number_of_events>" << std::endl;
+        return 1;
+    }
 
-	return 1;
+    TString inputList = argv[1];
+    TString outputFile = argv[2];
+    long numberOfEvents = std::stol(argv[3]);
+
+    return readFrameRootSim(inputList, outputFile, numberOfEvents);
 }
 
 int readFrameRootSim(TString list, TString ofname, long nevents)
 {
+    std::cout << "Input list: " << list << std::endl;
+    std::cout << "Output file: " << ofname << std::endl;
+    std::cout << "Number of events: " << nevents << std::endl;
 
 	// open file w/ frame reader
 	podio::ROOTReader *reader = new podio::ROOTReader();
@@ -125,7 +137,7 @@ int readFrameRootSim(TString list, TString ofname, long nevents)
 	cout<<"Number of events = "<<nEvents<<endl;
 
 	if(nevents>0) nEvents = nevents;
-	
+
 
 
 	TFile *output = new TFile(ofname, "recreate");
@@ -133,6 +145,7 @@ int readFrameRootSim(TString list, TString ofname, long nevents)
 
 	CreateHistogamsSim();
 	CreateHistogamsDepthCheck();
+	CreateHistogamsNeutronThresholds();
 
 
 	if(nevents>0) nEvents = nevents;
@@ -153,6 +166,7 @@ int readFrameRootSim(TString list, TString ofname, long nevents)
 
 	DeleteHistogamsSim();
 	DeleteHistogamsDepthCheck();
+	DeleteHistogamsNeutronThresholds();
 
 	output->Close();
 
@@ -666,6 +680,14 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 
 	h_nHCal_nhits->Fill(nHCal_hitscoll.size());
 
+        // vector<vector<double>> hits_passed{ {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0} };
+        // vector<vector<double>> hits_passed_telap{ {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0} };
+        // double E_mip = 0.00075;
+        // vector<double> t_max{25, 100, 500, 1000, 10000};
+        // vector<double> E_th{0.5 * E_mip, 0.25 * E_mip, 0.1 * E_mip, 0.05 * E_mip, 0};
+
+        auto hits_passed = NeutronThresholds::createHitsPassedMatrix();
+        auto hits_passed_telap = NeutronThresholds::createHitsPassedMatrix();
 
 		for (unsigned hit_iter = 0; hit_iter < nHCal_hitscoll.size(); ++hit_iter) {
 
@@ -695,11 +717,22 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 
 			//h_depth_nHCal_nhits_z->Fill(hit_nHCal.getPosition().z, nHCal_data->size());
 
-			//vector<edm4hep::CaloHitContributionData> *contrib_data = new vector<edm4hep::CaloHitContributionData>;
+			// vector<edm4hep::CaloHitContributionData> *contrib_data = new vector<edm4hep::CaloHitContributionData>;
 
-			//GetCaloHitContributionsData(hit_nHCal_data, nHCal_hitContrib_data, nHCal_relToContrib_data, contrib_data);
+			// GetCaloHitContributionsData(hit_nHCal_data, nHCal_hitContrib_data, nHCal_relToContrib_data, contrib_data);
 
 			auto contrib = hit_nHCal.getContributions();
+
+			NeutronThresholds::processContributions(contrib, hits_passed, hits_passed_telap, h_nHCal_hit_contrib_time, h_nHCal_hit_contrib_energy, debug);
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------
+//All these comments are the old code for processing contributions. Modular version is yet to be tested. Comments will be deleted when that is done.
+//--------------------------------------------------------------------------------------------------------------------------------------------------
+
+			// vector<double> E_sum{0,0,0,0,0};
+			// vector<double> E_sum_telap{0,0,0,0,0};
+
+			// double t_min = 1100;
 
 			for (unsigned c = 0; c < contrib.size(); ++c) {
 
@@ -710,11 +743,37 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 
 				if(debug) cout<<"hit time = "<<contrib.at(c).getTime()<<endl;
 
+				// h_nHCal_hit_contrib_time->Fill(contrib.at(c).getTime());
+				// h_nHCal_hit_contrib_time->Fill( 750 );
+				// h_nHCal_hit_contrib_energy->Fill(contrib.at(c).getEnergy());
+
+				// if ( contrib.at(c).getTime() < t_min ) { t_min = contrib.at(c).getTime(); }
+
+				// for ( int itm=0; itm < t_max.size(); itm++ ) {
+				// 	if ( contrib.at(c).getTime() < t_max[itm] ) { E_sum[itm]+=(contrib.at(c).getEnergy()); }
+				// 	if ( (contrib.at(c).getTime() - t_min) < t_max[itm] ) { E_sum_telap[itm]+=(contrib.at(c).getEnergy()); }
+				// }
 			}
 
+			// for ( int iet=0; iet < E_th.size(); iet++) {
+			//     for ( int ies=0; ies < E_sum.size(); ies++ ) {
+			// 		if (E_sum[ies] > E_th[iet]) { hits_passed[iet][ies]+=1; }
+   //                  if (E_sum_telap[ies] > E_th[iet]) { hits_passed_telap[iet][ies]+=1; }
+			// 	}
+		 //    }
 			//delete contrib_data;
 
 		} // HcalEndcapNHits loop
+
+		// for ( int iet=0; iet < E_th.size(); iet++) {
+		// 	for ( int itm=0; itm < t_max.size(); itm++ ) {
+		// 		if ( hits_passed[iet][itm] > 0 ) { h_nHCal_hit_contrib_energy_vs_time->Fill( E_th[iet], t_max[itm] ); }
+  //               if ( hits_passed_telap[iet][itm] > 0 ) { h_nHCal_hit_contrib_energy_vs_telap->Fill( E_th[iet], t_max[itm] ); }
+  //              	h_nHCal_hit_contrib_energy_vs_time_total->Fill( E_th[iet], t_max[itm] );
+		// 	}
+		// }
+		//
+		NeutronThresholds::fillThresholdHistograms(hits_passed,hits_passed_telap, h_nHCal_hit_contrib_energy_vs_time, h_nHCal_hit_contrib_energy_vs_telap, h_nHCal_hit_contrib_energy_vs_time_total);
 
 
 		for (int lbin = 1; lbin <= h_temp_depth_nHCal_z->GetXaxis()->GetNbins(); ++lbin) {

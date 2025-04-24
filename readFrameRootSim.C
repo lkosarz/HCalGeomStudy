@@ -96,6 +96,9 @@ bool debug = false;
 
 int readFrameRootSim(TString list, TString ofname, long nevents)
 {
+    std::cout << "Input list: " << list << std::endl;
+    std::cout << "Output file: " << ofname << std::endl;
+    std::cout << "Number of events: " << nevents << std::endl;
 
 	// open file w/ frame reader
 	podio::ROOTReader *reader = new podio::ROOTReader();
@@ -118,7 +121,7 @@ int readFrameRootSim(TString list, TString ofname, long nevents)
 	cout<<"Number of events = "<<nEvents<<endl;
 
 	if(nevents>0) nEvents = nevents;
-	
+
 
 
 	TFile *output = new TFile(ofname, "recreate");
