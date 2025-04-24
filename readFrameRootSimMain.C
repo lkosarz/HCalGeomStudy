@@ -100,6 +100,8 @@ int main(int argc, char **argv)
 {
     if (argc < 4) {
         std::cerr << "Usage: " << argv[0] << " <input_list> <output_file> <number_of_events>" << std::endl;
+        std::cerr << "Running with default arguments" << std::endl;
+        readFrameRootSim();
         return 1;
     }
 
