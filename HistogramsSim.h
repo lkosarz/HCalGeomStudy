@@ -229,6 +229,9 @@ TH3F *h_nHCal_hit_Rphi_Esum;
 // nCals
 TH1D *h_nCal_hits_Esum;
 
+// Sampling Fraction
+TH2D *h_nHCal_sampling_fraction_vs_E;
+TProfile *prof_nHCal_sampling_fraction_vs_E;
 
 void CreateHistogamsSim()
 {
@@ -446,6 +449,10 @@ void CreateHistogamsSim()
 
 	// nCals
 	h_nCal_hits_Esum = new TH1D("h_Ncal_hits_Esum", "Ncal-hit E sum; E [GeV]; counts", 200000, 0.0, 20.0);
+
+	// Sampling fraction
+	h_nHCal_sampling_fraction_vs_E = new TH2D("h_nHCal_sampling_fraction_vs_E", "nHCal sampling fraction vs. energy; E [GeV]; sampling fraction; counts", 200, 0.0, 20.0, 100, 0.0, 0.01);
+	prof_nHCal_sampling_fraction_vs_E = new TProfile("prof_nHCal_sampling_fraction_vs_E", "nHCal sampling fraction vs. energy; E [GeV]; sampling fraction", 200, 0.0, 20.0, 0.0, 0.01);
 
 
 
@@ -711,6 +718,10 @@ void DeleteHistogamsSim()
 
 	// nCals
 	delete h_nCal_hits_Esum;
+
+	// Sampling fraction
+	delete h_nHCal_sampling_fraction_vs_E;
+	delete prof_nHCal_sampling_fraction_vs_E;
 
 }
 
