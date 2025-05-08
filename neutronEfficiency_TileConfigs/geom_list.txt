@@ -1,0 +1,11 @@
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_12layers.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_12layers_tile5x5cm.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_15layers.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_15layers_tile5x5cm.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_20layers_abs2cm_sci4mm.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_20layers_abs2cm_sci4mm_tile5x5cm.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_20layers_abs4cm_sci8mm.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_20layers_abs4cm_sci8mm_tile5x5cm.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_25layers_LFHCAL.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_25layers_LFHCAL_tile5x5cm.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_tile5x5cm.xml
