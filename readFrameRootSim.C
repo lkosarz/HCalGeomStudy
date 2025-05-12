@@ -31,7 +31,6 @@ R__LOAD_LIBRARY(libfmt.so)
 #include <podio/Frame.h>
 #include <podio/CollectionBase.h>
 #include "podio/ROOTReader.h"
-#include <podio/ROOTFrameReader.h>
 #include "podio/CollectionIDTable.h"
 #include "podio/ObjectID.h"
 
