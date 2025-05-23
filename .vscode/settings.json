@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "readFrameRootSim.C": "cpp",
+        "style.C": "cpp",
+        "ebyh_ana.C": "cpp",
+        "ebyh_ratio.C": "cpp"
+    }
+}

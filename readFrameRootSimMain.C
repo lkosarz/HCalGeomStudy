@@ -310,6 +310,7 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 		}
 
 
+	Double_t genparticle_E;
 
 
 	for (unsigned mc_iter = 0; mc_iter < MCParticles_coll.size(); ++mc_iter) {
@@ -489,6 +490,8 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 		// Generated MC particles
 		if(mcpart.getGeneratorStatus()==1)
 		{
+			genparticle_E = mcpart.getEnergy();
+
 			h_MCpart_gen_mass->Fill(mcpart.getMass());
 			h_MCpart_gen_charge->Fill(mcpart.getCharge());
 			h_MCpart_gen_E->Fill(mcpart.getEnergy());
@@ -794,6 +797,11 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 
 		h_nHCal_hit_Esum->Fill(hit_nHCal_Esum);
 		h_nHCal_hit_EsumCorr->Fill(hit_nHCal_Esum/nHCal_samp_frac);
+        
+		
+		h_nHCal_sampling_fraction_vs_E->Fill(genparticle_E, hit_nHCal_Esum/genparticle_E);
+		prof_nHCal_sampling_fraction_vs_E->Fill(genparticle_E, hit_nHCal_Esum/genparticle_E);
+	
 
 
 		delete MCParticles_fromContrib_data;
