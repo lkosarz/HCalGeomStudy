@@ -13,6 +13,10 @@ mkdir "${OUT_DIR}"
 ## Pass commands to eic-shell
 #${EICSHELL} <<EOF
 
+# set energy values to simulate
+ENERGY_TAB=(1.0)
+PART_TAB=(pi-)
+
 #cd epic
 #rm -rf build
 #cmake -B build -S . -DCMAKE_INSTALL_PREFIX=install
@@ -20,8 +24,8 @@ mkdir "${OUT_DIR}"
 #cd ../
 
 ## Set environment
-#source epic/install/bin/thisepic.sh
-source /opt/detector/epic-main/bin/thisepic.sh
+source epic/install/bin/thisepic.sh
+#source /opt/detector/epic-main/bin/thisepic.sh
 #source /opt/detector/setup.sh
 #source epic/install/setup.sh
 
@@ -34,10 +38,14 @@ source /opt/detector/epic-main/bin/thisepic.sh
 #export LD_LIBRARY_PATH=${LOCAL_PREFIX}/epic/install/lib:$LD_LIBRARY_PATH
 
 ## Set geometry and events to simulate
-DETECTOR_CONFIG=epic_backward_hcal_only
-N_EVENTS=100
+DETECTOR_CONFIG=epic_backward_hcal_only_sampF
+N_EVENTS=10
 
-ene=1
+for ene in "${ENERGY_TAB[@]}"
+do  
+  
+	for part in "${PART_TAB[@]}"
+	do  
 
 # Set seed based on date
 SEED=$(date +%N)
@@ -50,6 +58,9 @@ OPTIONS="--compactFile ${DETECTOR_PATH}/${DETECTOR_CONFIG}.xml --numberOfEvents 
 echo $OPTIONS
 npsim $OPTIONS
 	
+	done
+done
+
 exit
 
 #EOF

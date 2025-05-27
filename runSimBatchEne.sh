@@ -14,16 +14,18 @@ mkdir "${CONDOR_DIR}/${OUT_DIR}"
 #${EICSHELL} <<EOF
 
 # set energy values to simulate
-ENERGY_TAB=(0.1 0.5 1.0 5.0 10.0)
+ENERGY_TAB=(0.2 0.3 0.4 0.5 0.7 1.0 2.0 5.0 10.0)
+PART_TAB=(pi- neutron)
 
-#cd epic
-#rm -rf build
-#cmake -B build -S . -DCMAKE_INSTALL_PREFIX=install
-#cmake --build build -j8 -- install
-#cd ../
+cd epic
+rm -rf build
+cmake -B build -S . -DCMAKE_INSTALL_PREFIX=install
+cmake --build build -j8 -- install
+cd ../
 
 ## Set environment
-source /opt/detector/epic-main/bin/thisepic.sh
+#source /opt/detector/epic-main/bin/thisepic.sh
+source epic/install/bin/thisepic.sh
 #source /opt/detector/setup.sh
 #source epic/install/setup.sh
 
@@ -36,24 +38,28 @@ source /opt/detector/epic-main/bin/thisepic.sh
 #export LD_LIBRARY_PATH=${LOCAL_PREFIX}/epic/install/lib:$LD_LIBRARY_PATH
 
 ## Set geometry and events to simulate
-DETECTOR_CONFIG=epic_calorimeters
-N_EVENTS=10
+DETECTOR_CONFIG=epic_backward_hcal_only_sampF
+N_EVENTS=500
 
 
 for ene in "${ENERGY_TAB[@]}"
 do  
   
+	for part in "${PART_TAB[@]}"
+	do  
+
 # Set seed based on date
 SEED=$(date +%N)
 #echo $SEED
 
 OPTIONS="--compactFile ${DETECTOR_PATH}/${DETECTOR_CONFIG}.xml --numberOfEvents ${N_EVENTS} --random.seed ${SEED} --enableGun \
-	--gun.particle proton --gun.thetaMin 170*degree --gun.thetaMax 180*degree --gun.distribution uniform \
-	--gun.energy ${ene}*GeV --outputFile ${CONDOR_DIR}/${OUT_DIR}/output_E${ene}GeV_${1}"
+	--gun.particle pi- --gun.thetaMin 170*degree --gun.thetaMax 180*degree --gun.distribution uniform \
+	--gun.energy ${ene}*GeV --outputFile ${CONDOR_DIR}/${OUT_DIR}/output_${part}_E${ene}GeV_${1}"
 
 echo $OPTIONS
 npsim $OPTIONS
 
+	done
 done
 	
 exit

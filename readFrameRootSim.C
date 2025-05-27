@@ -92,6 +92,7 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev);
 
 bool printEvNum = true;
 bool debug = false;
+dd4hep::Detector* det = NULL;
 
 int readFrameRootSim(TString list, TString ofname, long nevents)
 {
@@ -208,6 +209,10 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 	int nMCpart_sec = 0;
 
 	double hit_nHCal_Esum = 0.0;
+	double hit_nHCal_scint_Esum = 0.0;
+
+	double singlePart_E = 0.0;
+	double singlePart_Ekin = 0.0;
 
 
 	h_Events->Fill(1.0);
@@ -229,6 +234,29 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 	if(debug) cout<<"HcalEndcapNHits collection size = "<<nHCal_hitscoll.size()<<endl;
 
 
+//	Geometry
+//------------------
+
+	if(ev == 0)
+	{
+		TString compact_file = "epic/install/share/epic/epic_backward_hcal_only_sampF.xml";
+		//compact_file = "epic/install/share/epic/epic_lfhcal_only.xml";
+		//compact_file = "epic/install/share/epic/epic_backward_hcal_only.xml";
+
+		det = &(dd4hep::Detector::getInstance());
+		det->fromCompact(compact_file.Data());
+		det->volumeManager();
+		det->apply("DD4hepVolumeManager", 0, 0);
+	}
+
+	dd4hep::rec::CellIDPositionConverter cellid_converter(*det);
+
+	// Get our readout ID spec for HcalEndcapNHits
+	auto idSpecBarrel = det->readout("HcalEndcapNHits").idSpec();
+
+	// Get our cell ID decoder
+	auto decoder = idSpecBarrel.decoder();
+	const int slice_index = decoder->index("slice");
 
 
 //---------------------------------
@@ -390,6 +418,12 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 			cout<<"MCParticle px = "<<mcMom.x()<<endl;
 			cout<<"MCParticle py = "<<mcMom.y()<<endl;
 			cout<<"MCParticle pz = "<<mcMom.z()<<endl;
+		}
+
+		if(mc_iter == 0)
+		{
+			singlePart_E = mcpart.getEnergy();
+			singlePart_Ekin = mcpart.getEnergy()-mcpart.getMass();
 		}
 
 		h_MCpart_mass->Fill(mcpart.getMass());
@@ -698,7 +732,15 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 			if(!hit_nHCal.isAvailable())
 				cout<<"CalorimeterHit does not exist! index = "<<hit_nHCal<<endl;
 
+			const int hit_slice = decoder->get(hit_nHCal.getCellID(), slice_index);
+
 			hit_nHCal_Esum += hit_nHCal.getEnergy();
+			if(hit_slice == 3) hit_nHCal_scint_Esum += hit_nHCal.getEnergy();
+
+
+			//cout<<"hit_slice = "<<hit_slice<<endl;
+			//cout<<"Escint = "<<hit_nHCal_scint_Esum<<endl;
+			//cout<<"Esum = "<<hit_nHCal_Esum<<endl;
 
 			h_nHCal_hit_E->Fill(hit_nHCal.getEnergy());
 			h_nHCal_hit_Ecorr->Fill(hit_nHCal.getEnergy()/nHCal_samp_frac);
@@ -749,6 +791,14 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 			}
 
 		} // HcalEndcapNHits loop
+
+
+
+		// Sampling fraction
+		h_nHCal_sampling_fraction_vs_E->Fill(singlePart_Ekin, hit_nHCal_scint_Esum/hit_nHCal_Esum);
+		prof_nHCal_sampling_fraction_vs_E->Fill(singlePart_Ekin, hit_nHCal_scint_Esum/hit_nHCal_Esum);
+
+		//cout<<"Ekin = "<<singlePart_Ekin<<"\tsampF = "<<hit_nHCal_scint_Esum/hit_nHCal_Esum<<" = "<<hit_nHCal_scint_Esum<<"/"<<hit_nHCal_Esum<<endl;
 
 
 		for (int lbin = 1; lbin <= h_temp_depth_nHCal_z->GetXaxis()->GetNbins(); ++lbin) {

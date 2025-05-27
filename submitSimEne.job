@@ -26,9 +26,9 @@ Rank		= CPU_Speed
 Initialdir      = /gpfs02/eic/lkosarzew/Calorimetry/testScripts
 
 executable              = runSimBatchEne.sh
-arguments               = hcal_pion_$(Cluster)_$(Process)_sim.edm4hep.root $(Process) $(Cluster)
+arguments               = hcal_$(Cluster)_$(Process)_sim.edm4hep.root $(Process) $(Cluster)
 
-transfer_input_files    = runSimBatchEne.sh
+transfer_input_files    = runSimBatchEne.sh,epic
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
 transfer_output_files   = condorSim
@@ -41,4 +41,4 @@ Log                     = condorSim/log/$(Cluster)_$(Process).log
 #+Experiment     = "experiment"
 #+Job_Type       = "cas"
 
-Queue 10
+Queue 200

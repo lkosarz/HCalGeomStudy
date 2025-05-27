@@ -451,8 +451,8 @@ void CreateHistogamsSim()
 	h_nCal_hits_Esum = new TH1D("h_Ncal_hits_Esum", "Ncal-hit E sum; E [GeV]; counts", 200000, 0.0, 20.0);
 
 	// Sampling fraction
-	h_nHCal_sampling_fraction_vs_E = new TH2D("h_nHCal_sampling_fraction_vs_E", "nHCal sampling fraction vs. energy; E [GeV]; sampling fraction; counts", 200, 0.0, 20.0, 100, 0.0, 0.01);
-	prof_nHCal_sampling_fraction_vs_E = new TProfile("prof_nHCal_sampling_fraction_vs_E", "nHCal sampling fraction vs. energy; E [GeV]; sampling fraction", 200, 0.0, 20.0, 0.0, 0.01);
+	h_nHCal_sampling_fraction_vs_E = new TH2D("h_nHCal_sampling_fraction_vs_E", "nHCal sampling fraction vs. energy; E [GeV]; sampling fraction; counts", 200, 0.0, 20.0, 500, 0.0, 0.05);
+	prof_nHCal_sampling_fraction_vs_E = new TProfile("prof_nHCal_sampling_fraction_vs_E", "nHCal sampling fraction vs. energy; E [GeV]; sampling fraction", 200, 0.0, 20.0, 0.0, 0.05);
 
 
 
