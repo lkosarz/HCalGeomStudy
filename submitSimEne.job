@@ -23,7 +23,7 @@ Rank		= CPU_Speed
 #request_cpus = 1
 
 # Used to give jobs a directory with respect to file input and output.
-Initialdir      = /gpfs02/eic/lkosarzew/Calorimetry/testScripts
+Initialdir      = /gpfs02/eic/lkosarzew/Calorimetry/Simulations/HCalGeomStudy
 
 executable              = runSimBatchEne.sh
 arguments               = hcal_$(Cluster)_$(Process)_sim.edm4hep.root $(Process) $(Cluster)
