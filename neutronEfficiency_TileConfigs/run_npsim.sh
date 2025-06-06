@@ -17,7 +17,7 @@ if [ ! -f "$GEOM_FILE" ]; then
     exit 1
 fi
 
-N_EVT=10
+N_EVT=10000
 
 echo "n events: $N_EVT"
 

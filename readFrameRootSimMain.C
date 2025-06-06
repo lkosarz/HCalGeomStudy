@@ -308,7 +308,7 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 		}
 
 
-
+	double MCEta = -999;
 
 	for (unsigned mc_iter = 0; mc_iter < MCParticles_coll.size(); ++mc_iter) {
 
@@ -354,6 +354,8 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 
 		//vector<edm4hep::MCParticleData> *parents_check = new vector<edm4hep::MCParticleData>;
 		//GetMCParentsData(mcpart_data, MCParticles_data, MCparents_data, parents_check);
+
+		MCEta = mcMom.Eta();
 
 		auto parents_check = mcpart.getParents();
 
@@ -680,6 +682,8 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 
 	h_nHCal_nhits->Fill(nHCal_hitscoll.size());
 
+	if ( MCEta < -1.5 && MCEta > -3.3 ) {
+
         // vector<vector<double>> hits_passed{ {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0} };
         // vector<vector<double>> hits_passed_telap{ {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0} };
         // double E_mip = 0.00075;
@@ -774,7 +778,7 @@ int MakeEvent(podio::ROOTReader *reader, unsigned ev)
 		// }
 		//
 		NeutronThresholds::fillThresholdHistograms(hits_passed,hits_passed_telap, h_nHCal_hit_contrib_energy_vs_time, h_nHCal_hit_contrib_energy_vs_telap, h_nHCal_hit_contrib_energy_vs_time_total);
-
+	}// MCEta < -1.5 && MCEta > -3.3
 
 		for (int lbin = 1; lbin <= h_temp_depth_nHCal_z->GetXaxis()->GetNbins(); ++lbin) {
 

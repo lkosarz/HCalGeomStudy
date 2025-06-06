@@ -9,3 +9,4 @@
 /users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_25layers_LFHCAL.xml
 /users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_25layers_LFHCAL_tile5x5cm.xml
 /users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_tile5x5cm.xml
+/users/PAS2524/corey90/epic/install/share/epic/epic_backward_hcal_only.xml

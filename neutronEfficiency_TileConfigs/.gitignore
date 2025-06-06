@@ -1,2 +1,8 @@
 calibrations
 fieldmaps
+*.pdf
+*.png
+*.svg
+energy_list_old.txt
+geom_list.txt
+geom_list_old.txt
